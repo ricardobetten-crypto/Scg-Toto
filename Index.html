@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+:root{
+  --k1:#0e4194; --k2:#94c7ec; --k1t:#fff; --k2t:#14213d;
+  --rood:#e30613; --geel:#fecc00;
+  --bg:#eef3f9; --kaart:#fff; --tekst:#14213d; --zacht:#5d6b82; --rand:#dbe4ef; --vlak:#e9f0f8;
+  --goed:#15803d; --goedbg:#dcfce7; --fout:#b91c1c; --foutbg:#fee2e2;
+  --schaduw:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#0b1220; --kaart:#141d2e; --tekst:#e6edf7; --zacht:#93a3bc; --rand:#243149; --vlak:#1c2840;
+    --goed:#4ade80; --goedbg:#14321f; --fout:#f87171; --foutbg:#3a1717; --schaduw:none; }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tekst);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.verborgen{display:none!important}
+
+/* kop */
+header{position:sticky;top:0;z-index:20;background:var(--k1);color:var(--k1t);
+  padding:12px 16px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+header .logo{width:44px;height:48px;border-radius:12px;background:#fff;display:grid;place-items:center;overflow:hidden;flex:none;
+  padding:3px;box-shadow:0 0 0 2px var(--k2)}
+header .logo img{width:100%;height:100%;object-fit:contain}
+header .logo span{font-weight:800;color:var(--k1);font-size:13px}
+header .titel{flex:1;min-width:0}
+header h1{margin:0;font-size:19px;letter-spacing:.2px;line-height:1.15}
+header .sub{font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .wie{font-size:13px;text-align:right;opacity:.95}
+header .wie button{background:none;border:0;padding:0;color:inherit;opacity:.8;text-decoration:underline;font-size:12px}
+header{background:linear-gradient(180deg,var(--k1) calc(100% - 4px),var(--k2) calc(100% - 4px))}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:5px;
+  background:repeating-linear-gradient(90deg,var(--rood) 0 22px,var(--geel) 22px 44px)}
+
+main{max-width:560px;margin:0 auto;padding:14px 14px 96px}
+
+/* onderbalk */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--kaart);border-top:1px solid var(--rand);
+  display:flex;justify-content:center;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs .in{display:flex;width:100%;max-width:560px}
+nav.tabs button{flex:1;background:none;border:0;padding:6px 2px 4px;color:var(--zacht);font-size:11.5px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:12px;position:relative}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button.actief{color:var(--k1)}
+@media (prefers-color-scheme:dark){ nav.tabs button.actief{color:var(--k2)} }
+nav.tabs .stip{position:absolute;top:3px;right:calc(50% - 20px);width:9px;height:9px;border-radius:50%;background:#ef4444;border:2px solid var(--kaart)}
+
+/* kaarten */
+.kaart{background:var(--kaart);border-radius:18px;box-shadow:var(--schaduw);border:1px solid var(--rand);padding:16px;margin-bottom:14px}
+.kaart h2{margin:0 0 4px;font-size:17px}
+.kaart h3{margin:0 0 10px;font-size:15px}
+.zacht{color:var(--zacht)}
+.klein{font-size:12.5px}
+.info{background:var(--vlak);border-radius:12px;padding:10px 12px;font-size:13.5px;margin:10px 0}
+.foutmelding{background:var(--foutbg);color:var(--fout);border-radius:12px;padding:10px 12px;font-size:13.5px;margin:10px 0}
+
+.knop{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;padding:13px 18px;
+  background:var(--k1);color:var(--k1t);font-weight:700;font-size:15.5px;width:100%;transition:transform .08s,opacity .2s}
+.knop:active{transform:scale(.98)}
+.knop[disabled]{opacity:.55}
+.knop.tweede{background:var(--vlak);color:var(--tekst)}
+.knop.klein{width:auto;padding:8px 12px;font-size:13.5px;border-radius:11px}
+.knop.gevaar{background:var(--foutbg);color:var(--fout)}
+.linkknop{background:none;border:0;padding:0;color:var(--k1);font-weight:600;text-decoration:underline}
+@media (prefers-color-scheme:dark){ .linkknop{color:var(--k2)} }
+
+label.veld{display:block;font-size:13px;font-weight:600;color:var(--zacht);margin:12px 0 0}
+.veld input,.veld select,.veld textarea,input.invoer,select.invoer{display:block;width:100%;margin-top:5px;padding:12px 13px;border-radius:12px;
+  border:1.5px solid var(--rand);background:var(--kaart);font-size:16px;outline:none}
+.veld input:focus,.veld textarea:focus,select.invoer:focus,input.invoer:focus{border-color:var(--k1)}
+input.code{font-size:28px;letter-spacing:10px;text-align:center;font-weight:700}
+
+/* login */
+.welkom{text-align:center;padding:18px 0 8px}
+.welkom .groot-logo{width:104px;height:124px;border-radius:22px;margin:0 auto 14px;background:#fff;display:grid;place-items:center;overflow:hidden;
+  padding:8px;box-shadow:0 0 0 4px var(--k2),var(--schaduw)}
+.welkom .groot-logo img{width:100%;height:100%;object-fit:contain}
+.welkom .groot-logo span{font-weight:800;color:var(--k1);font-size:24px}
+.welkom h2{margin:0;font-size:24px}
+
+/* ronde */
+.ronde-kop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pil{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.pil.open{background:var(--k2);color:var(--k2t)}
+.pil.slot{background:var(--vlak);color:var(--zacht)}
+.pil.goed{background:var(--goedbg);color:var(--goed)}
+.voortgang{height:7px;border-radius:99px;background:var(--vlak);overflow:hidden;margin:12px 0 2px}
+.voortgang div{height:100%;background:var(--k1);border-radius:99px;transition:width .3s}
+@media (prefers-color-scheme:dark){ .voortgang div{background:var(--k2)} }
+
+.wed{padding:13px 0;border-top:1px solid var(--rand)}
+.wed:first-of-type{border-top:0}
+.wed .wanneer{font-size:12px;color:var(--zacht);margin-bottom:6px;display:flex;justify-content:space-between}
+.duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;font-weight:700;font-size:15px;margin-bottom:9px}
+.duel .thuis{text-align:left}.duel .uit{text-align:right}
+.duel .vs{font-size:11px;color:var(--zacht);font-weight:600}
+.duel .eigen{color:var(--k1)}
+@media (prefers-color-scheme:dark){ .duel .eigen{color:var(--k2)} }
+.keuzes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.keuzes button{border:1.5px solid var(--rand);background:var(--kaart);border-radius:13px;padding:9px 4px 7px;display:flex;flex-direction:column;align-items:center;
+  transition:all .12s}
+.keuzes button b{font-size:19px;line-height:1}
+.keuzes button small{font-size:10.5px;color:var(--zacht);margin-top:3px;font-weight:600}
+.keuzes button.gekozen{background:var(--k1);border-color:var(--k1);color:var(--k1t)}
+.keuzes button.gekozen small{color:var(--k1t);opacity:.85}
+.keuzes button:active{transform:scale(.96)}
+.keuzes button[disabled]{cursor:default}
+.keuzes button.goed{background:var(--goedbg);border-color:var(--goed);color:var(--goed)}
+.keuzes button.goed small{color:var(--goed)}
+
+/* verdeling */
+.verdeling{display:flex;height:22px;border-radius:8px;overflow:hidden;font-size:11px;font-weight:700;margin-top:8px}
+.verdeling div{display:flex;align-items:center;justify-content:center;min-width:0;white-space:nowrap;overflow:hidden}
+.verdeling .v1{background:var(--k1);color:var(--k1t)}
+.verdeling .vX{background:var(--vlak);color:var(--zacht)}
+.verdeling .v2{background:var(--k2);color:var(--k2t)}
+.uitslagregel{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;margin-top:6px}
+.badge{display:inline-grid;place-items:center;min-width:28px;height:26px;padding:0 7px;border-radius:8px;font-weight:800;font-size:14px;background:var(--vlak)}
+.badge.uitslag{background:var(--k1);color:var(--k1t)}
+.badge.goed{background:var(--goedbg);color:var(--goed)}
+.badge.fout{background:var(--foutbg);color:var(--fout)}
+details{margin-top:8px}
+details summary{font-size:13px;color:var(--zacht);font-weight:600;cursor:pointer;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"▸ ";}
+details[open] summary::before{content:"▾ ";}
+.wiekoos{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:13px;margin-top:6px}
+.wiekoos span{display:flex;justify-content:space-between;gap:6px}
+.wiekoos .ikke{font-weight:800}
+
+/* stand */
+.topper{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--k1),color-mix(in srgb,var(--k1) 70%,#000));color:var(--k1t);border:0}
+.topper .beker{font-size:38px;line-height:1}
+.topper .wie{font-size:19px;font-weight:800}
+.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px;margin:4px 0 14px;text-align:center}
+.podium .p{background:var(--kaart);border:1px solid var(--rand);border-radius:16px 16px 8px 8px;padding:10px 6px;box-shadow:var(--schaduw)}
+.podium .p .n{font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.podium .p .pt{font-size:22px;font-weight:900;color:var(--k1)}
+@media (prefers-color-scheme:dark){ .podium .p .pt{color:var(--k2)} }
+.podium .p .m{font-size:22px}
+.podium .p1{padding-top:18px;border-top:4px solid var(--geel)}
+.lijst .rij{display:flex;align-items:center;gap:12px;padding:11px 4px;border-top:1px solid var(--rand)}
+.lijst .rij:first-child{border-top:0}
+.lijst .plek{width:26px;text-align:center;font-weight:800;color:var(--zacht)}
+.lijst .naam{flex:1;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lijst .tp{font-size:12.5px;color:var(--zacht)}
+.lijst .pt{font-weight:900;font-size:17px;min-width:34px;text-align:right}
+.lijst .rij.ikke{background:color-mix(in srgb,var(--k2) 22%,transparent);border-radius:12px}
+
+/* beheer */
+.rijen .wrij{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;border:1px solid var(--rand);border-radius:14px;margin-top:8px;position:relative}
+.rijen .wrij .vol{grid-column:1/-1}
+.rijen .wrij .weg{position:absolute;top:-9px;right:-6px;width:24px;height:24px;border-radius:50%;border:1px solid var(--rand);background:var(--kaart);font-size:14px;line-height:1}
+.rijen select,.rijen input{width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--rand);background:var(--kaart);font-size:15px}
+.knoppenrij{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.knoppenrij .knop{flex:1}
+.spelerrij{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--rand);flex-wrap:wrap}
+.spelerrij:first-child{border-top:0}
+.spelerrij .naam{flex:1;min-width:140px}
+.spelerrij .naam small{display:block;color:var(--zacht);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.kleuren{display:flex;gap:12px;margin-top:8px}
+.kleuren label{flex:1;font-size:13px;font-weight:600;color:var(--zacht)}
+.kleuren input{display:block;width:100%;height:46px;border:1.5px solid var(--rand);border-radius:12px;padding:3px;background:var(--kaart);margin-top:5px}
+.logo-voorbeeld{width:68px;height:80px;border-radius:14px;padding:5px;background:#fff;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 3px var(--k2);flex:none}
+.logo-voorbeeld img{width:100%;height:100%;object-fit:contain}
+
+/* extra: SCG-wedstrijd */
+.extra{margin-top:10px;padding:12px;border-radius:14px;background:var(--vlak);border:1.5px dashed var(--k2)}
+.extra-kop{font-weight:800;font-size:14px}
+.extra .score{display:grid;grid-template-columns:1fr 62px auto 62px 1fr;align-items:center;gap:8px;margin-top:10px;font-weight:700;font-size:13.5px}
+.extra .score .uit{text-align:right}
+.extra .score .vs{color:var(--zacht)}
+.extra select{width:100%;padding:9px 6px;border-radius:10px;border:1.5px solid var(--rand);background:var(--kaart);font-size:16px}
+.extra .scorers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.extra .scorers label{font-size:12px;font-weight:600;color:var(--zacht)}
+.extra .scorers select{margin-top:3px;color:var(--tekst)}
+.extra-voet{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.extra-uitslag{font-size:13px;margin-top:8px;background:var(--vlak);border-radius:10px;padding:8px 10px;line-height:1.55}
+.extralijst{display:grid;gap:4px;font-size:13px;margin-top:6px}
+.extralijst span{display:flex;justify-content:space-between;gap:8px}
+.extralijst .ikke{font-weight:800}
+
+.leeg{text-align:center;padding:26px 10px;color:var(--zacht)}
+.leeg .ico{font-size:40px;margin-bottom:6px}
+.laden{display:grid;place-items:center;padding:60px 0;color:var(--zacht)}
+.spinner{width:34px;height:34px;border-radius:50%;border:4px solid var(--rand);border-top-color:var(--k1);animation:draai .8s linear infinite;margin-bottom:10px}
+@keyframes draai{to{transform:rotate(360deg)}}
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#111;color:#fff;
+  padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:50;max-width:90vw;text-align:center}
+#toast.zien{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.fout{background:#b91c1c}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" id="kopLogo"></div>
+  <div class="titel"><h1>SCG Toto</h1><div class="sub" id="kopSub"></div></div>
+  <div class="wie" id="wie"></div>
+</header>
+<main id="app"><div class="laden"><div class="spinner"></div>Laden…</div></main>
+<nav class="tabs verborgen" id="tabs"><div class="in" id="tabsIn"></div></nav>
+<div id="toast"></div>
+
+<script>
+var UITNODIGING = <?= code ?>;
+var SESSIE = <?= sessie ?>;
+var HUISSTIJL = JSON.parse(<?= huisstijl ?>);
+var LOGO = <?= logo ?>;
+</script>
+<script>
+(function(){
+'use strict';
+var TOKEN_KEY = 'scgToto_token', TAB_KEY = 'scgToto_tab';
+function lsGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function lsSet(k,v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){} }
+
+// Inlogsleutel ook in de link zetten: wie die link als bladwijzer of op het beginscherm heeft, blijft ingelogd
+// ook als de telefoon de opgeslagen gegevens van het Google-kader wist.
+function linkSleutel(t){
+  try { google.script.history.replace(null, t ? { s: t } : {}); } catch(e){}
+}
+var token = lsGet(TOKEN_KEY) || SESSIE || null, data = null, beheer = null, tab = lsGet(TAB_KEY) || 'invullen';
+var $app = document.getElementById('app');
+
+/* ---------- algemeen ---------- */
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function call(fn){
+  var args = Array.prototype.slice.call(arguments, 1);
+  return new Promise(function(res, rej){
+    var r = google.script.run.withSuccessHandler(res).withFailureHandler(function(e){
+      var m = String((e && e.message) || e).replace(/^(Exception|Error|Uitzondering):\s*/i, '');
+      if (m.indexOf('AUTH:') === 0) { uitloggen(); m = m.slice(5).trim(); }
+      rej(new Error(m));
+    });
+    r[fn].apply(r, args);
+  });
+}
+var toastTimer;
+function toast(t, fout){
+  var el = document.getElementById('toast');
+  el.textContent = t; el.className = 'zien' + (fout ? ' fout' : '');
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.className = fout ? 'fout' : ''; }, fout ? 4200 : 1800);
+}
+function laden(t){ return '<div class="laden"><div class="spinner"></div>' + esc(t || 'Laden…') + '</div>'; }
+
+var fDag = new Intl.DateTimeFormat('nl-NL', {weekday:'short', day:'numeric', month:'short', timeZone:'Europe/Amsterdam'});
+var fTijd = new Intl.DateTimeFormat('nl-NL', {hour:'2-digit', minute:'2-digit', timeZone:'Europe/Amsterdam'});
+var fDagNr = new Intl.DateTimeFormat('nl-NL', {weekday:'short', day:'numeric', timeZone:'Europe/Amsterdam'});
+function dag(ms){ return fDag.format(new Date(ms)).replace('.', ''); }
+function tijd(ms){ return fTijd.format(new Date(ms)); }
+function dagSleutel(ms){ return delen(ms).slice(0, 10); }
+function delen(ms){
+  var p = {};
+  new Intl.DateTimeFormat('en-CA', {year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'Europe/Amsterdam'})
+    .formatToParts(new Date(ms)).forEach(function(x){ p[x.type] = x.value; });
+  return p.year + '-' + p.month + '-' + p.day + 'T' + p.hour + ':' + p.minute;
+}
+function weekendTekst(r){
+  if (dagSleutel(r.eersteMs) === dagSleutel(r.laatsteMs)) return dag(r.eersteMs);
+  return fDagNr.format(new Date(r.eersteMs)).replace('.', '') + ' – ' + dag(r.laatsteMs);
+}
+function nogTijd(ms){
+  var d = ms - Date.now();
+  if (d <= 0) return 'op slot';
+  var m = Math.floor(d / 60000), u = Math.floor(m / 60), dg = Math.floor(u / 24);
+  if (dg >= 1) return 'nog ' + dg + ' d ' + (u % 24) + ' u';
+  if (u >= 1) return 'nog ' + u + ' u ' + (m % 60) + ' min';
+  return 'nog ' + m + ' min';
+}
+function plural(n, een, meer){ return n + ' ' + (n === 1 ? een : meer); }
+
+/* ---------- huisstijl ---------- */
+function helder(hex){
+  var n = parseInt(hex.slice(1), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  var f = function(c){ c /= 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); };
+  return .2126 * f(r) + .7152 * f(g) + .0722 * f(b);
+}
+function pasHuisstijlToe(h, logo){
+  var s = document.documentElement.style;
+  s.setProperty('--k1', h.kleur1); s.setProperty('--k2', h.kleur2);
+  s.setProperty('--k1t', helder(h.kleur1) > .45 ? '#141414' : '#ffffff');
+  s.setProperty('--k2t', helder(h.kleur2) > .45 ? '#141414' : '#ffffff');
+  document.getElementById('kopSub').textContent = (h.clubnaam || '') + (h.competitie ? ' · ' + h.competitie : '');
+  var init = esc((h.clubnaam || 'SCG').replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase());
+  document.getElementById('kopLogo').innerHTML = logo ? '<img alt="" src="' + logo + '">' : '<span>' + init + '</span>';
+  var m = document.querySelector('meta[name=theme-color]');
+  if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
+  m.content = h.kleur1;
+}
+function logoHtml(){
+  var init = esc((HUISSTIJL.clubnaam || 'SCG').replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase());
+  return LOGO ? '<img alt="" src="' + LOGO + '">' : '<span>' + init + '</span>';
+}
+pasHuisstijlToe(HUISSTIJL, LOGO);
+
+/* ---------- inloggen ---------- */
+function uitloggen(){
+  token = null; data = null; beheer = null; lsSet(TOKEN_KEY, null); SESSIE = ''; linkSleutel(null);
+  document.getElementById('wie').innerHTML = '';
+  document.getElementById('tabs').classList.add('verborgen');
+}
+
+var login = { stap: 'mail', modus: UITNODIGING ? 'nieuw' : 'inloggen', email: '', naam: '', uitn: '', heeftSpelers: true };
+
+function toonLogin(melding){
+  document.getElementById('tabs').classList.add('verborgen');
+  var nieuw = login.modus === 'nieuw';
+  var html = '<div class="welkom"><div class="groot-logo">' + logoHtml() + '</div>' +
+    '<h2>' + (nieuw ? 'Doe mee met de SCG Toto' : 'Welkom terug') + '</h2>' +
+    '<div class="zacht">Invullen Toto stelletje flikkers</div></div>' +
+    '<section class="kaart">';
+  if (melding) html += '<div class="foutmelding">' + esc(melding) + '</div>';
+  if (login.stap === 'mail') {
+    if (!login.heeftSpelers) html += '<div class="info">Er doet nog niemand mee. Jij wordt de eerste speler én de beheerder.</div>';
+    if (nieuw && !UITNODIGING && login.heeftSpelers) html += '<label class="veld">Uitnodigingscode (staat in de teamapp)<input id="lUitn" maxlength="20" autocomplete="off" autocapitalize="off" value="' + esc(login.uitn) + '" placeholder="bijv. 7c6760819640"></label>';
+    if (nieuw) html += '<label class="veld">Je naam (zoals de rest je kent)<input id="lNaam" maxlength="25" autocomplete="nickname" value="' + esc(login.naam) + '" placeholder="bijv. Ricardo B."></label>';
+    html += '<label class="veld">E-mailadres<input id="lMail" type="email" inputmode="email" autocomplete="email" value="' + esc(login.email) + '" placeholder="naam@voorbeeld.nl"></label>' +
+      '<div style="height:14px"></div><button class="knop" id="lGo">Stuur mij een code</button>' +
+      '<p class="klein zacht" style="text-align:center;margin:14px 0 0">' +
+      (nieuw ? 'Doe je al mee? <button class="linkknop" id="lWissel">Inloggen</button>'
+             : 'Nieuw? <button class="linkknop" id="lWissel">Account maken</button>') +
+      '</p>';
+  } else {
+    html += '<div class="info">We hebben een code van 6 cijfers gestuurd naar <b>' + esc(login.email) + '</b>. Kijk ook even bij spam.</div>' +
+      '<label class="veld">Code<input id="lCode" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"></label>' +
+      '<div style="height:14px"></div><button class="knop" id="lGo">Inloggen</button>' +
+      '<p class="klein zacht" style="text-align:center;margin:14px 0 0"><button class="linkknop" id="lOpnieuw">Nieuwe code sturen</button> · <button class="linkknop" id="lTerug">Ander e-mailadres</button></p>';
+  }
+  html += '</section>';
+  $app.innerHTML = html;
+
+  var go = document.getElementById('lGo');
+  var wissel = document.getElementById('lWissel');
+  if (wissel) wissel.onclick = function(){ login.modus = nieuw ? 'inloggen' : 'nieuw'; toonLogin(); };
+  var terug = document.getElementById('lTerug');
+  if (terug) terug.onclick = function(){ login.stap = 'mail'; toonLogin(); };
+  var opnieuw = document.getElementById('lOpnieuw');
+  if (opnieuw) opnieuw.onclick = function(){ vraagCode(); };
+
+  if (login.stap === 'mail') {
+    go.onclick = function(){
+      login.email = document.getElementById('lMail').value.trim();
+      var n = document.getElementById('lNaam'); if (n) login.naam = n.value.trim();
+      var u = document.getElementById('lUitn'); if (u) login.uitn = u.value.trim();
+      vraagCode();
+    };
+    var f = document.getElementById(nieuw ? 'lNaam' : 'lMail');
+    document.getElementById('lMail').onkeydown = function(e){ if (e.key === 'Enter') go.click(); };
+    if (f && !f.value) f.focus();
+  } else {
+    var c = document.getElementById('lCode');
+    c.oninput = function(){ c.value = c.value.replace(/\D/g, '').slice(0, 6); if (c.value.length === 6) go.click(); };
+    go.onclick = function(){
+      if (c.value.length !== 6) return toast('Vul de 6 cijfers in', true);
+      go.disabled = true; go.textContent = 'Even kijken…';
+      call('api_controleerCode', login.email, c.value).then(function(r){
+        token = r.token; lsSet(TOKEN_KEY, token);
+        toast(r.nieuw ? 'Welkom bij de SCG Toto! Je blijft 30 dagen ingelogd.' : 'Ingelogd voor 30 dagen');
+        login.stap = 'mail';
+        laadOverzicht();
+      }).catch(function(e){ toonLogin(e.message); });
+    };
+    c.focus();
+  }
+}
+function vraagCode(){
+  var go = document.getElementById('lGo');
+  if (go) { go.disabled = true; go.textContent = 'Code versturen…'; }
+  call('api_vraagCode', login.email, login.modus === 'nieuw' ? login.naam : '', UITNODIGING || login.uitn)
+    .then(function(){ login.stap = 'code'; toonLogin(); toast('Code verstuurd'); })
+    .catch(function(e){ toonLogin(e.message); });
+}
+
+/* ---------- app ---------- */
+var ICONEN = {
+  invullen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m12 7 4 3-1.5 5h-5L8 10z"/></svg>',
+  stand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>',
+  uitslagen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4M8 14h3M8 17h6"/></svg>',
+  beheer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>'
+};
+
+function laadOverzicht(stil){
+  if (!stil) $app.innerHTML = laden();
+  return call('api_overzicht', token).then(function(d){
+      data = d;
+      if (!stil) { lsSet(TOKEN_KEY, token); linkSleutel(token); }
+      toonApp(stil);
+    })
+    .catch(function(e){ if (!token) { start(e.message); } else if (!stil) { $app.innerHTML = '<div class="kaart foutmelding">' + esc(e.message) + '</div>'; } });
+}
+
+/** Het weekend waarvoor je nu kunt inzetten: open sinds zondag 20:00 en nog niet op slot. */
+function huidigeRonde(){
+  if (!data) return null;
+  for (var i = 0; i < data.rondes.length; i++) if (data.rondes[i].open && data.rondes[i].geopend) return data.rondes[i];
+  return null;
+}
+/** Het eerstvolgende weekend dat nog open moet gaan. */
+function volgendeRonde(){
+  if (!data) return null;
+  for (var i = 0; i < data.rondes.length; i++) if (data.rondes[i].open && !data.rondes[i].geopend) return data.rondes[i];
+  return null;
+}
+function openTeVullen(){
+  var r = huidigeRonde();
+  return r ? r.wedstrijden.filter(function(w){ return !w.mijn; }).length : 0;
+}
+
+function toonTabs(){
+  var tabs = [['invullen','Invullen'],['stand','Stand'],['uitslagen','Uitslagen']];
+  if (data.ik.beheer) tabs.push(['beheer','Beheer']);
+  if (!tabs.some(function(t){ return t[0] === tab; })) tab = 'invullen';
+  var open = openTeVullen();
+  document.getElementById('tabsIn').innerHTML = tabs.map(function(t){
+    return '<button data-tab="' + t[0] + '" class="' + (t[0] === tab ? 'actief' : '') + '">' + ICONEN[t[0]] + t[1] +
+      (t[0] === 'invullen' && open ? '<span class="stip"></span>' : '') + '</button>';
+  }).join('');
+  document.getElementById('tabs').classList.remove('verborgen');
+}
+document.getElementById('tabsIn').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-tab]'); if (!b) return;
+  tab = b.getAttribute('data-tab'); lsSet(TAB_KEY, tab);
+  window.scrollTo(0, 0);
+  toonApp();
+  laadOverzicht(true);
+});
+
+function toonApp(stil){
+  if (stil && document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  document.getElementById('wie').innerHTML = esc(data.ik.naam) + '<br><button id="uitlog">Uitloggen</button>';
+  document.getElementById('uitlog').onclick = function(){ uitloggen(); login.stap = 'mail'; login.modus = 'inloggen'; toonLogin(); };
+  toonTabs();
+  if (tab === 'invullen') viewInvullen();
+  else if (tab === 'stand') viewStand();
+  else if (tab === 'uitslagen') viewUitslagen();
+  else if (tab === 'beheer') viewBeheer(stil);
+}
+
+/* ---------- Invullen ---------- */
+var LABEL = { '1': 'thuis', 'X': 'gelijk', '2': 'uit' };
+function keuzeKnoppen(w, actief){
+  return '<div class="keuzes">' + ['1','X','2'].map(function(k){
+    var cls = w.mijn === k ? 'gekozen' : '';
+    if (!actief && w.uitslag === k) cls = 'goed';
+    if (!actief && w.mijn === k && w.uitslag && w.uitslag !== k) cls = 'gekozen';
+    return '<button data-wed="' + esc(w.id) + '" data-k="' + k + '" class="' + cls + '"' + (actief ? '' : ' disabled') + '><b>' + k + '</b><small>' + LABEL[k] + '</small></button>';
+  }).join('') + '</div>';
+}
+function duel(w){
+  var club = (HUISSTIJL.clubnaam || '').toLowerCase();
+  function t(n, c){ return '<span class="' + c + (club && n.toLowerCase() === club ? ' eigen' : '') + '">' + esc(n) + '</span>'; }
+  return '<div class="duel">' + t(w.thuis, 'thuis') + '<span class="vs">–</span>' + t(w.uit, 'uit') + '</div>';
+}
+function verdelingHtml(v){
+  var tot = v['1'] + v['X'] + v['2'];
+  if (!tot) return '';
+  return '<div class="verdeling">' + ['1','X','2'].map(function(k){
+    var p = Math.round(v[k] / tot * 100);
+    return p ? '<div class="v' + k + '" style="width:' + p + '%">' + (p >= 12 ? k + ' ' + p + '%' : '') + '</div>' : '';
+  }).join('') + '</div>';
+}
+function wieKoos(w){
+  if (!w.alle || !w.alle.length) return '';
+  return '<details><summary>Wie koos wat (' + w.alle.length + ')</summary><div class="wiekoos">' + w.alle.map(function(a){
+    var cls = a.goed === true ? 'goed' : (a.goed === false ? 'fout' : '');
+    return '<span class="' + (a.ik ? 'ikke' : '') + '">' + esc(a.naam) + ' <span class="badge ' + cls + '" style="height:20px;min-width:22px;font-size:12px">' + a.keuze + '</span></span>';
+  }).join('') + '</div></details>';
+}
+
+/* ---------- Extra: SCG-wedstrijd ---------- */
+var extraConcept = {}, standConcept = {};
+function vindW(id){
+  var w = null;
+  data.rondes.forEach(function(r){ r.wedstrijden.forEach(function(x){ if (x.id === id) w = x; }); });
+  return w;
+}
+function conceptVan(w, modus){
+  var map = modus === 'beheer' ? standConcept : extraConcept;
+  if (!map[w.id]) {
+    var bron = modus === 'beheer' ? (w.stand ? { stand: w.stand, scorers: w.scorers } : null) : w.mijnExtra;
+    var d = bron && bron.stand ? bron.stand.split('-') : ['', ''];
+    map[w.id] = { t: d[0], u: d[1], s: bron ? (bron.scorers || []).slice() : [] };
+  }
+  return map[w.id];
+}
+function eigenGoals(c, w){ var n = w.club === 'thuis' ? c.t : c.u; return n === '' ? 0 : Number(n); }
+function goalOpts(v){
+  var h = '<option value="">?</option>';
+  for (var i = 0; i <= 10; i++) h += '<option' + (String(v) === String(i) ? ' selected' : '') + '>' + i + '</option>';
+  return h;
+}
+function scorerOpts(v){
+  var lijst = (data.selectie || []).concat([data.eigenGoal]);
+  return '<option value="">Kies…</option>' + lijst.map(function(n){ return '<option' + (n === v ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('');
+}
+function standTekst(stand, scorers){
+  return stand + (scorers && scorers.length ? ' · ' + scorers.join(', ') : '');
+}
+function extraBlok(w, modus){
+  var c = conceptVan(w, modus), n = eigenGoals(c, w), heeftSelectie = (data.selectie || []).length > 0;
+  var bewaard = modus === 'beheer' ? (w.stand ? standTekst(w.stand, w.scorers) : '') : (w.mijnExtra ? standTekst(w.mijnExtra.stand, w.mijnExtra.scorers) : '');
+  var html = '<div class="extra" data-extra="' + esc(w.id) + '" data-modus="' + modus + '">';
+  if (modus === 'invullen') html += '<div class="extra-kop">⭐ Extra: de precieze uitslag + wie scoort er voor SCG?</div>' +
+    '<div class="klein zacht">Uitslag precies goed = +1 punt. Elke goede doelpuntenmaker = +1 punt.</div>';
+  html += '<div class="score"><span>' + esc(w.thuis) + '</span><select data-x="t" aria-label="Goals ' + esc(w.thuis) + '">' + goalOpts(c.t) + '</select>' +
+    '<span class="vs">–</span><select data-x="u" aria-label="Goals ' + esc(w.uit) + '">' + goalOpts(c.u) + '</select><span class="uit">' + esc(w.uit) + '</span></div>';
+  if (n > 0 && heeftSelectie) {
+    html += '<div class="scorers">';
+    for (var i = 0; i < n; i++) html += '<label>' + (n === 1 ? 'Wie scoort?' : 'Goal ' + (i + 1)) + '<select data-x="s" data-i="' + i + '">' + scorerOpts(c.s[i]) + '</select></label>';
+    html += '</div>';
+  } else if (n > 0) {
+    html += '<div class="info">De selectie staat er nog niet in, dus alleen de uitslag telt.</div>';
+  }
+  html += '<div class="extra-voet"><span class="klein zacht">' + (bewaard ? '✓ Opgeslagen: ' + esc(bewaard) : (modus === 'beheer' ? 'Nog geen uitslag' : 'Nog niet opgeslagen')) + '</span>' +
+    '<button class="knop klein" data-extraopslaan="' + esc(w.id) + '">Opslaan</button></div></div>';
+  return html;
+}
+$app.addEventListener('change', function(e){
+  var sel = e.target.closest('.extra select'); if (!sel) return;
+  var blok = sel.closest('.extra'), w = vindW(blok.getAttribute('data-extra')), modus = blok.getAttribute('data-modus');
+  if (!w) return;
+  var c = conceptVan(w, modus), x = sel.getAttribute('data-x');
+  if (x === 's') { c.s[Number(sel.getAttribute('data-i'))] = sel.value; return; }
+  c[x] = sel.value;
+  blok.outerHTML = extraBlok(w, modus);
+});
+$app.addEventListener('click', function(e){
+  var k = e.target.closest('[data-extraopslaan]'); if (!k || k.disabled) return;
+  var blok = k.closest('.extra'), w = vindW(k.getAttribute('data-extraopslaan')), modus = blok.getAttribute('data-modus');
+  if (!w) return;
+  var c = conceptVan(w, modus);
+  if (c.t === '' || c.u === '') return toast('Vul bij allebei de ploegen het aantal goals in', true);
+  var n = eigenGoals(c, w);
+  var scorers = (data.selectie || []).length ? c.s.slice(0, n) : [];
+  for (var i = 0; i < scorers.length; i++) if (!scorers[i]) return toast(n === 1 ? 'Kies wie de goal maakt' : 'Kies bij elke goal wie er scoort', true);
+  k.disabled = true; k.textContent = 'Opslaan…';
+  if (modus === 'beheer') {
+    call('api_stand', token, w.id, c.t, c.u, scorers).then(function(){ delete standConcept[w.id]; return herlaadBeheer('Uitslag opgeslagen'); })
+      .catch(function(er){ toast(er.message, true); k.disabled = false; k.textContent = 'Opslaan'; });
+  } else {
+    call('api_extra', token, w.id, c.t, c.u, scorers).then(function(r){
+      if (!w.mijnExtra) w.aantalExtra = (w.aantalExtra || 0) + 1;
+      w.mijnExtra = { stand: r.stand, scorers: r.scorers, punten: null };
+      c.s = r.scorers.slice();
+      var b = document.querySelector('.extra[data-extra="' + w.id + '"]');
+      if (b) b.outerHTML = extraBlok(w, modus);
+      toast('Extra opgeslagen ⭐');
+    }).catch(function(er){ toast(er.message, true); k.disabled = false; k.textContent = 'Opslaan'; });
+  }
+});
+function extraUitslag(w){
+  if (!w.club) return '';
+  var m = w.mijnExtra;
+  var html = '<div class="extra-uitslag">⭐ Uitslag <b>' + (w.stand ? esc(standTekst(w.stand, w.scorers)) : '?') + '</b><br>Jij: ' +
+    (m ? esc(standTekst(m.stand, m.scorers)) + (m.punten !== null ? ' <span class="badge ' + (m.punten ? 'goed' : 'fout') + '" style="height:20px;font-size:12px">+' + m.punten + '</span>' : '') : '–') + '</div>';
+  if (w.alleExtra && w.alleExtra.length) {
+    html += '<details><summary>Extra: wie voorspelde wat (' + w.alleExtra.length + ')</summary><div class="extralijst">' + w.alleExtra.map(function(a){
+      return '<span class="' + (a.ik ? 'ikke' : '') + '"><span>' + esc(a.naam) + ' <span class="zacht">' + esc(standTekst(a.stand, a.scorers)) + '</span></span>' +
+        (a.punten !== null ? '<b>+' + a.punten + '</b>' : '') + '</span>';
+    }).join('') + '</div></details>';
+  }
+  return html;
+}
+
+function viewInvullen(){
+  // Alleen het weekend waarvoor je nu kunt inzetten; wat op slot staat vind je bij Uitslagen.
+  var huidig = huidigeRonde();
+  var open = huidig ? [huidig] : [];
+  var html = '';
+  if (!open.length) {
+    var vlg = volgendeRonde();
+    html += vlg
+      ? '<div class="kaart leeg"><div class="ico">⏳</div><b>Weekend ' + esc(weekendTekst(vlg)) + '</b><br><span class="klein">Invullen kan vanaf <b>' + esc(dag(vlg.openMs)) + ' 20:00</b> tot vrijdag 23:59.<br>De uitslagen en wat iedereen koos vind je bij Uitslagen.</span>' +
+        '<div style="margin-top:10px"><span class="pil open" data-slot="' + vlg.openMs + '" data-open="1">⏳ ' + esc(nogTijd(vlg.openMs).replace('nog ', 'over ')) + '</span></div></div>'
+      : '<div class="kaart leeg"><div class="ico">⚽</div><b>Nog niks in te vullen</b><br><span class="klein">Er staan geen wedstrijden meer gepland. Wat al op slot staat, zie je bij Uitslagen.</span></div>';
+  }
+  open.forEach(function(r, i){
+    var gedaan = r.wedstrijden.filter(function(w){ return w.mijn; }).length, tot = r.wedstrijden.length;
+    html += '<section class="kaart" data-ronde="' + esc(r.sleutel) + '"><div class="ronde-kop"><div><h2>Weekend ' + esc(weekendTekst(r)) + '</h2>' +
+      '<div class="zacht klein">Week ' + r.nr + ' · invullen tot ' + esc(dag(r.slotMs)) + ' ' + esc(tijd(r.slotMs)) + '</div></div>' +
+      '<span class="pil open" data-slot="' + r.slotMs + '">⏱ ' + esc(nogTijd(r.slotMs)) + '</span></div>' +
+      '<div class="voortgang"><div style="width:' + (tot ? gedaan / tot * 100 : 0) + '%"></div></div>' +
+      '<div class="klein zacht teller">' + gedaan + ' van ' + tot + ' ingevuld' + (gedaan === tot && tot ? ' ✓' : '') + '</div>';
+    r.wedstrijden.forEach(function(w){
+      html += '<div class="wed"><div class="wanneer"><span>' + esc(dag(w.aftrapMs)) + ' · ' + esc(tijd(w.aftrapMs)) + '</span><span>' +
+        plural(w.aantal, 'speler', 'spelers') + ' ingevuld</span></div>' + duel(w) + keuzeKnoppen(w, true) + (w.club ? extraBlok(w, 'invullen') : '') + '</div>';
+    });
+    html += '</section>';
+  });
+  $app.innerHTML = html;
+}
+
+$app.addEventListener('click', function(e){
+  var b = e.target.closest('.keuzes button[data-wed]');
+  if (!b || b.disabled) return;
+  var id = b.getAttribute('data-wed'), k = b.getAttribute('data-k');
+  var w = null, r = null;
+  data.rondes.forEach(function(rr){ rr.wedstrijden.forEach(function(ww){ if (ww.id === id) { w = ww; r = rr; } }); });
+  if (!w || w.mijn === k) return;
+  var vorige = w.mijn;
+  w.mijn = k;
+  if (!vorige) w.aantal++;
+  var groep = b.parentNode;
+  Array.prototype.forEach.call(groep.children, function(x){ x.classList.toggle('gekozen', x === b); });
+  werkTellerBij(r);
+  if (navigator.vibrate) { try { navigator.vibrate(8); } catch(er){} }
+  call('api_voorspel', token, id, k).then(function(){
+    if (r.wedstrijden.every(function(x){ return x.mijn; })) toast('Alles ingevuld voor dit weekend 👍');
+  }).catch(function(er){
+    w.mijn = vorige; if (!vorige) w.aantal--;
+    toast(er.message, true);
+    laadOverzicht(true);
+  });
+});
+function werkTellerBij(r){
+  var s = document.querySelector('section[data-ronde="' + r.sleutel + '"]');
+  if (!s) return;
+  var gedaan = r.wedstrijden.filter(function(w){ return w.mijn; }).length, tot = r.wedstrijden.length;
+  s.querySelector('.voortgang div').style.width = (gedaan / tot * 100) + '%';
+  s.querySelector('.teller').textContent = gedaan + ' van ' + tot + ' ingevuld' + (gedaan === tot ? ' ✓' : '');
+  var spans = s.querySelectorAll('.wed .wanneer span:last-child');
+  r.wedstrijden.forEach(function(w, i){ if (spans[i]) spans[i].textContent = plural(w.aantal, 'speler', 'spelers') + ' ingevuld'; });
+  toonTabs();
+}
+setInterval(function(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-slot]'), function(el){
+    var ms = Number(el.getAttribute('data-slot'));
+    el.textContent = el.getAttribute('data-open') ? '⏳ ' + nogTijd(ms).replace('nog ', 'over ') : '⏱ ' + nogTijd(ms);
+    if (ms <= Date.now() && token) laadOverzicht(true);
+  });
+}, 30000);
+
+/* ---------- Stand ---------- */
+function viewStand(){
+  var html = '';
+  var gesloten = data.rondes.filter(function(r){ return !r.open && r.toppers.length; });
+  var laatste = gesloten[gesloten.length - 1];
+  if (laatste) {
+    html += '<section class="kaart topper"><div class="beker">🏆</div><div><div class="klein" style="opacity:.85">Topper van het weekend · week ' + laatste.nr + (laatste.klaar ? '' : ' (voorlopig)') + '</div>' +
+      '<div class="wie">' + esc(laatste.toppers.join(' & ')) + '</div><div class="klein" style="opacity:.85">' + plural(laatste.max, 'punt', 'punten') +
+      (laatste.mijnPunten !== null ? ' · jij: ' + laatste.mijnPunten : '') + '</div></div></section>';
+  }
+  var k = data.klassement;
+  var gespeeld = k.some(function(r){ return r.gespeeld; });
+  if (!gespeeld) {
+    html += '<div class="kaart leeg"><div class="ico">🏆</div><b>Nog geen stand</b><br><span class="klein">Zodra de eerste uitslagen erin staan, zie je hier wie er bovenaan staat.</span></div>';
+  } else {
+    var top = k.slice(0, 3);
+    if (top.length === 3) {
+      var p = function(r, i){ return '<div class="p p' + (i + 1) + '"><div class="m">' + ['🥇','🥈','🥉'][i] + '</div><div class="n">' + esc(r.naam) + '</div><div class="pt">' + r.punten + '</div><div class="klein zacht">punten</div></div>'; };
+      html += '<div class="podium">' + p(top[1], 1) + p(top[0], 0) + p(top[2], 2) + '</div>';
+    }
+  }
+  html += '<section class="kaart"><h2>Klassement</h2><div class="zacht klein" style="margin-bottom:6px">1 punt per goede voorspelling + extra punten bij de SCG-wedstrijd · 🏆 = keer Topper van het weekend</div><div class="lijst">' +
+    k.map(function(r){
+      return '<div class="rij' + (r.ik ? ' ikke' : '') + '"><div class="plek">' + r.plek + '</div><div class="naam">' + esc(r.naam) + '</div>' +
+        (r.toppers ? '<div class="tp">🏆 ' + r.toppers + '</div>' : '') + '<div class="pt">' + r.punten + '</div></div>';
+    }).join('') + '</div></section>';
+  var met = data.rondes.filter(function(r){ return !r.open && r.toppers.length; }).reverse();
+  if (met.length) {
+    html += '<section class="kaart"><h2>Toppers per weekend</h2><div class="lijst">' + met.map(function(r){
+      return '<div class="rij"><div class="naam">Week ' + r.nr + ' <span class="zacht klein">· ' + esc(weekendTekst(r)) + '</span><br><b>' + esc(r.toppers.join(' & ')) + '</b>' + (r.klaar ? '' : ' <span class="zacht klein">(voorlopig)</span>') + '</div>' +
+        '<div class="pt">' + r.max + ' <span class="klein zacht">pt</span></div></div>';
+    }).join('') + '</div></section>';
+  }
+  html += '<section class="kaart"><h3>Zo werkt het</h3><div class="klein zacht">Elk weekend voorspel je alle wedstrijden uit de competitie: <b>1</b> = thuisploeg wint, <b>X</b> = gelijk, <b>2</b> = uitploeg wint. ' +
+    'Goed = 1 punt. Bij de wedstrijd van SCG voorspel je ook de precieze uitslag en wie er voor SCG scoort: uitslag precies goed = +1 punt, elke goede doelpuntenmaker = +1 punt. Invullen kan van <b>zondag 20:00</b> tot <b>vrijdag 23:59</b>, daarna gaat het weekend op slot en zie je wat de rest koos. Wie in een weekend de meeste punten haalt, is de <b>Topper van het weekend</b>. Bij gelijke punten in het klassement telt wie vaker Topper was.</div></section>';
+  $app.innerHTML = html;
+}
+
+/* ---------- Uitslagen ---------- */
+function viewUitslagen(){
+  // Alle weekenden die op slot staan, nieuwste bovenaan (ook als de uitslagen nog moeten komen).
+  var rondes = data.rondes.filter(function(r){ return !r.open; }).reverse();
+  if (!rondes.length) { $app.innerHTML = '<div class="kaart leeg"><div class="ico">📋</div><b>Nog geen uitslagen</b><br><span class="klein">Zodra een weekend op slot gaat, zie je hier wat iedereen koos, en na de wedstrijden de uitslagen en je punten.</span></div>'; return; }
+  $app.innerHTML = rondes.map(function(r){
+    var goed = 0, gekozen = 0, metUitslag = 0;
+    r.wedstrijden.forEach(function(w){ if (w.uitslag) metUitslag++; if (w.uitslag && w.mijn) { gekozen++; if (w.mijn === w.uitslag) goed++; } });
+    var pil = metUitslag ? '<span class="pil goed">jij: ' + plural(r.mijnPunten || 0, 'punt', 'punten') + '</span>' : '<span class="pil slot">🔒 uitslagen volgen</span>';
+    return '<section class="kaart"><div class="ronde-kop"><div><h2>Week ' + r.nr + '</h2><div class="zacht klein">' + esc(weekendTekst(r)) +
+      (r.toppers.length ? ' · 🏆 ' + esc(r.toppers.join(' & ')) + ' (' + r.max + ')' : '') + '</div></div>' + pil + '</div>' +
+      r.wedstrijden.map(function(w){
+        var mijnCls = !w.mijn || !w.uitslag ? '' : (w.mijn === w.uitslag ? 'goed' : 'fout');
+        return '<div class="wed">' + duel(w) + '<div class="uitslagregel"><span>Uitslag <span class="badge uitslag">' + (w.uitslag || '?') + '</span></span>' +
+          '<span>Jij <span class="badge ' + mijnCls + '">' + (w.mijn || '–') + '</span></span></div>' +
+          (w.verdeling ? verdelingHtml(w.verdeling) : '') + wieKoos(w) + extraUitslag(w) + '</div>';
+      }).join('') + '</section>';
+  }).join('');
+}
+
+/* ---------- Beheer ---------- */
+var concept = null, alleProgramma = false;
+function standaardAftrap(){
+  var d = new Date(); var dg = d.getDay(); d.setDate(d.getDate() + ((7 - dg) % 7 || 7));
+  return delen(d.getTime()).slice(0, 10) + 'T14:00';
+}
+function viewBeheer(stil){
+  if (!beheer || !stil) {
+    if (!beheer) $app.innerHTML = laden();
+    call('api_beheer', token).then(function(b){ beheer = b; tekenBeheer(); }).catch(function(e){ $app.innerHTML = '<div class="kaart foutmelding">' + esc(e.message) + '</div>'; });
+    if (!beheer) return;
+  }
+  tekenBeheer();
+}
+function teamOpties(gekozen){
+  var lijst = beheer.teams.slice();
+  if (gekozen && lijst.indexOf(gekozen) < 0) lijst.unshift(gekozen);
+  return '<option value="">Kies…</option>' + lijst.map(function(t){ return '<option' + (t === gekozen ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('');
+}
+function tekenBeheer(){
+  if (tab !== 'beheer') return;
+  var b = beheer, html = '';
+  if (!concept) {
+    var a = standaardAftrap(), n = b.teams.length >= 2 ? Math.floor(b.teams.length / 2) : 7;
+    concept = []; for (var i = 0; i < n; i++) concept.push({ aftrap: a, thuis: '', uit: '' });
+  }
+  // 1. Uitslagen invullen
+  var nu = Date.now(), uit = [];
+  var klaarW = function(w){ return w.club ? !!w.stand : !!w.uitslag; };
+  data.rondes.forEach(function(r){ r.wedstrijden.forEach(function(w){ if (w.aftrapMs <= nu && !klaarW(w)) uit.push(w); }); });
+  var recent = [];
+  data.rondes.forEach(function(r){ r.wedstrijden.forEach(function(w){ if (klaarW(w) && w.aftrapMs > nu - 10 * 864e5) recent.push(w); }); });
+  html += '<section class="kaart"><h2>Uitslagen invullen</h2>';
+  if (!uit.length) html += '<div class="zacht klein">Alle gespeelde wedstrijden hebben een uitslag. 👌</div>';
+  uit.concat(recent).forEach(function(w){
+    if (w.club) {
+      html += '<div class="wed"><div class="wanneer"><span>' + esc(dag(w.aftrapMs)) + ' · ' + esc(tijd(w.aftrapMs)) + ' · ⭐ uitslag + scorers</span>' +
+        (w.uitslag ? '<button class="linkknop klein" data-uitslag="' + esc(w.id) + '" data-k="">wissen</button>' : '<span>nog geen uitslag</span>') + '</div>' + duel(w) + extraBlok(w, 'beheer') + '</div>';
+      return;
+    }
+    html += '<div class="wed"><div class="wanneer"><span>' + esc(dag(w.aftrapMs)) + ' · ' + esc(tijd(w.aftrapMs)) + '</span>' +
+      (w.uitslag ? '<button class="linkknop klein" data-uitslag="' + esc(w.id) + '" data-k="">wissen</button>' : '<span>nog geen uitslag</span>') + '</div>' + duel(w) +
+      '<div class="keuzes">' + ['1','X','2'].map(function(k){
+        return '<button data-uitslag="' + esc(w.id) + '" data-k="' + k + '" class="' + (w.uitslag === k ? 'goed' : '') + '"><b>' + k + '</b><small>' + LABEL[k] + '</small></button>';
+      }).join('') + '</div></div>';
+  });
+  html += '</section>';
+
+  // 2. Speelronde toevoegen
+  html += '<section class="kaart"><h2>Speelweekend toevoegen</h2><div class="zacht klein">Zet het programma van een weekend erin. Spelers kunnen dan meteen invullen, tot vrijdag 23:59.</div>';
+  if (!b.teams.length) html += '<div class="info">Zet eerst hieronder bij <b>Ploegen</b> de ploegen uit jullie competitie, dan kun je ze hier kiezen.</div>';
+  html += '<div class="rijen">' + concept.map(function(c, i){
+    return '<div class="wrij" data-i="' + i + '"><button class="weg" data-weg="' + i + '" title="Weg">×</button>' +
+      '<select data-veld="thuis">' + teamOpties(c.thuis) + '</select><select data-veld="uit">' + teamOpties(c.uit) + '</select>' +
+      '<input type="date" data-veld="datum" value="' + esc(c.aftrap.slice(0, 10)) + '"><input type="time" data-veld="tijd" value="' + esc(c.aftrap.slice(11, 16)) + '"></div>';
+  }).join('') + '</div><div class="knoppenrij"><button class="knop tweede" id="bRegel">+ Wedstrijd</button><button class="knop" id="bRonde">Weekend opslaan</button></div></section>';
+
+  // 3. Programma
+  var alleKomend = [];
+  data.rondes.forEach(function(r){ if (r.open || !r.klaar) alleKomend.push(r); });
+  var komend = alleProgramma ? alleKomend : alleKomend.slice(0, 2);
+  if (komend.length) {
+    html += '<section class="kaart"><h2>Programma</h2><div class="zacht klein">Wedstrijden die nog niet klaar zijn. Tik op een wedstrijd om hem te wijzigen of te verwijderen.</div>';
+    komend.forEach(function(r){
+      html += '<h3 style="margin:14px 0 4px">Week ' + r.nr + ' · ' + esc(weekendTekst(r)) + (r.open ? '' : ' 🔒') + '</h3>';
+      r.wedstrijden.forEach(function(w){
+        html += '<details class="wed" style="margin:0"><summary>' + esc(dag(w.aftrapMs)) + ' ' + esc(tijd(w.aftrapMs)) + ' · <b style="color:var(--tekst)">' + esc(w.thuis) + ' – ' + esc(w.uit) + '</b></summary>' +
+          '<div class="rijen"><div class="wrij" data-wijzig="' + esc(w.id) + '"><select data-veld="thuis">' + teamOpties(w.thuis) + '</select><select data-veld="uit">' + teamOpties(w.uit) + '</select>' +
+          '<input type="date" data-veld="datum" value="' + esc(delen(w.aftrapMs).slice(0, 10)) + '"><input type="time" data-veld="tijd" value="' + esc(delen(w.aftrapMs).slice(11, 16)) + '">' +
+          '<div class="vol knoppenrij" style="margin:0"><button class="knop klein" data-opslaan="' + esc(w.id) + '">Opslaan</button><button class="knop klein gevaar" data-verwijder="' + esc(w.id) + '">Verwijderen</button></div></div></div></details>';
+      });
+    });
+    if (alleKomend.length > 2) {
+      html += '<div class="knoppenrij"><button class="knop tweede" id="bAllesProg">' +
+        (alleProgramma ? 'Alleen de komende 2 weekenden' : 'Hele seizoen tonen (' + alleKomend.length + ' weekenden)') + '</button></div>';
+    }
+    html += '</section>';
+  }
+
+  // 4. Uitnodigen
+  html += '<section class="kaart"><h2>Uitnodigen</h2><div class="zacht klein">Deel deze link in de groepsapp. Alleen wie de link heeft, kan een account maken.</div>' +
+    '<input class="invoer" id="bLink" readonly value="' + esc(b.link) + '">' +
+    '<div class="klein zacht" style="margin-top:8px">Uitnodigingscode: <b style="color:var(--tekst);letter-spacing:1px">' + esc(b.code) + '</b> (voor wie via de Google Site meedoet: Account maken → code invullen)</div>' +
+    '<div class="knoppenrij"><button class="knop" id="bKopieer">Kopieer link</button>' +
+    '<a class="knop tweede" style="text-decoration:none" target="_blank" href="https://wa.me/?text=' + encodeURIComponent('Doe mee met de SCG Toto! Elk weekend 1, X of 2 voorspellen 🏆 ' + b.link) + '">Deel via WhatsApp</a></div>' +
+    '<p class="klein zacht" style="margin:10px 0 0">Link op straat beland? <button class="linkknop" id="bNieuweLink">Maak een nieuwe link</button> (de oude werkt dan niet meer).</p></section>';
+
+  // 5. Ploegen
+  html += '<section class="kaart"><h2>Ploegen</h2><div class="zacht klein">Eén ploeg per regel, precies zoals op de website (bijv. van Hollandse Velden of voetbal.nl).</div>' +
+    '<label class="veld"><textarea id="bTeams" rows="8">' + esc(b.teams.join('\n')) + '</textarea></label>' +
+    '<div class="knoppenrij"><button class="knop" id="bTeamsOpslaan">Ploegen opslaan</button></div></section>';
+
+  // 5b. Selectie
+  html += '<section class="kaart"><h2>Selectie ' + esc(b.huisstijl.clubnaam) + '</h2><div class="zacht klein">Voornamen, één per regel. Hieruit kiezen spelers wie er bij SCG scoort. "' + esc(data.eigenGoal) + '" staat er altijd bij.</div>' +
+    '<label class="veld"><textarea id="bSelectie" rows="8">' + esc((b.selectie || []).join('\n')) + '</textarea></label>' +
+    '<div class="knoppenrij"><button class="knop" id="bSelectieOpslaan">Selectie opslaan</button></div></section>';
+
+  // 6. Huisstijl
+  var h = b.huisstijl;
+  html += '<section class="kaart"><h2>Logo en kleuren</h2>' +
+    '<div style="display:flex;gap:14px;align-items:center;margin-top:8px"><div class="logo-voorbeeld" id="bLogoVb">' + logoHtml() + '</div>' +
+    '<div style="flex:1"><label class="knop tweede klein" style="width:100%">Logo kiezen<input type="file" id="bLogo" accept="image/*" class="verborgen"></label>' +
+    '<div class="klein zacht" style="margin-top:6px">De kleuren worden uit het logo gehaald. Je kunt ze daarna nog aanpassen.</div></div></div>' +
+    '<div class="kleuren"><label>Hoofdkleur<input type="color" id="bK1" value="' + esc(h.kleur1) + '"></label><label>Accentkleur<input type="color" id="bK2" value="' + esc(h.kleur2) + '"></label></div>' +
+    '<label class="veld">Clubnaam (wordt in het programma gemarkeerd)<input id="bClub" value="' + esc(h.clubnaam) + '"></label>' +
+    '<label class="veld">Competitie<input id="bComp" value="' + esc(h.competitie) + '"></label>' +
+    '<div class="knoppenrij"><button class="knop" id="bStijl">Opslaan</button></div></section>';
+
+  // 7. Spelers
+  html += '<section class="kaart"><h2>Spelers (' + b.spelers.length + ')</h2>' + b.spelers.map(function(s){
+    return '<div class="spelerrij"><div class="naam"><b>' + esc(s.naam) + '</b>' + (s.beheer ? ' <span class="pil open" style="padding:1px 7px;font-size:11px">beheer</span>' : '') +
+      '<small>' + esc(s.email) + ' · ' + plural(s.aantal, 'voorspelling', 'voorspellingen') + '</small></div>' +
+      '<button class="knop tweede klein" data-beheer="' + esc(s.id) + '" data-aan="' + (s.beheer ? '' : '1') + '">' + (s.beheer ? 'Geen beheer' : 'Maak beheer') + '</button>' +
+      (s.naam === data.ik.naam ? '' : '<button class="knop gevaar klein" data-spelerweg="' + esc(s.id) + '">Verwijder</button>') + '</div>';
+  }).join('') + '</section>';
+
+  $app.innerHTML = html;
+  koppelBeheer();
+}
+
+function leesRij(el){
+  var g = function(v){ var x = el.querySelector('[data-veld="' + v + '"]'); return x ? x.value : ''; };
+  return { thuis: g('thuis'), uit: g('uit'), aftrap: g('datum') + 'T' + (g('tijd') || '14:00') };
+}
+function bewaarConcept(){
+  Array.prototype.forEach.call(document.querySelectorAll('.wrij[data-i]'), function(el){
+    concept[Number(el.getAttribute('data-i'))] = leesRij(el);
+  });
+}
+function nogEens(knop, tekst){
+  if (knop.getAttribute('data-zeker')) return true;
+  knop.setAttribute('data-zeker', '1');
+  var oud = knop.textContent; knop.textContent = tekst || 'Zeker weten?';
+  setTimeout(function(){ knop.removeAttribute('data-zeker'); knop.textContent = oud; }, 3500);
+  return false;
+}
+function herlaadBeheer(melding){
+  return Promise.all([call('api_overzicht', token), call('api_beheer', token)]).then(function(r){
+    data = r[0]; beheer = r[1]; toonTabs(); tekenBeheer(); if (melding) toast(melding);
+  });
+}
+function bezig(knop, p){
+  knop.disabled = true;
+  return p.catch(function(e){ toast(e.message, true); }).then(function(){ knop.disabled = false; });
+}
+
+function koppelBeheer(){
+  var $ = function(id){ return document.getElementById(id); };
+  // uitslagen
+  Array.prototype.forEach.call(document.querySelectorAll('[data-uitslag]'), function(k){
+    k.onclick = function(){
+      var id = k.getAttribute('data-uitslag'), v = k.getAttribute('data-k');
+      if (!v) delete standConcept[id];
+      bezig(k, call('api_uitslag', token, id, v).then(function(){ return herlaadBeheer(v ? 'Uitslag opgeslagen' : 'Uitslag gewist'); }));
+    };
+  });
+  // concept-weekend
+  Array.prototype.forEach.call(document.querySelectorAll('.wrij[data-i] select, .wrij[data-i] input'), function(el){
+    el.onchange = function(){
+      var rij = el.closest('.wrij'), i = Number(rij.getAttribute('data-i'));
+      var oud = concept[i];
+      bewaarConcept();
+      // datum/tijd van de eerste regel doortrekken naar regels die nog gelijk waren
+      if (i === 0 && (el.getAttribute('data-veld') === 'datum' || el.getAttribute('data-veld') === 'tijd')) {
+        concept.forEach(function(c, j){ if (j > 0 && c.aftrap === oud.aftrap) c.aftrap = concept[0].aftrap; });
+        tekenBeheer();
+      }
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-weg]'), function(k){
+    k.onclick = function(){ bewaarConcept(); concept.splice(Number(k.getAttribute('data-weg')), 1); if (!concept.length) concept = null; tekenBeheer(); };
+  });
+  $('bRegel').onclick = function(){ bewaarConcept(); var l = concept[concept.length - 1]; concept.push({ aftrap: l ? l.aftrap : standaardAftrap(), thuis: '', uit: '' }); tekenBeheer(); };
+  $('bRonde').onclick = function(){
+    bewaarConcept();
+    var regels = concept.filter(function(c){ return c.thuis || c.uit; });
+    if (!regels.length) return toast('Kies eerst de ploegen', true);
+    var gezien = {}, dubbel = null;
+    regels.forEach(function(c){ [c.thuis, c.uit].forEach(function(t){ if (t && gezien[t]) dubbel = t; gezien[t] = 1; }); });
+    if (dubbel) return toast(dubbel + ' staat er twee keer in', true);
+    var knop = $('bRonde');
+    bezig(knop, call('api_rondeToevoegen', token, regels).then(function(n){ concept = null; return herlaadBeheer(n + ' wedstrijden toegevoegd'); }));
+  };
+  // programma wijzigen
+  if ($('bAllesProg')) $('bAllesProg').onclick = function(){ bewaarConcept(); alleProgramma = !alleProgramma; tekenBeheer(); };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-opslaan]'), function(k){
+    k.onclick = function(){
+      var rij = k.closest('.wrij'), w = leesRij(rij); w.id = k.getAttribute('data-opslaan');
+      bezig(k, call('api_wedstrijdWijzigen', token, w).then(function(){ return herlaadBeheer('Wedstrijd gewijzigd'); }));
+    };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-verwijder]'), function(k){
+    k.onclick = function(){
+      if (!nogEens(k, 'Zeker? Ook alle voorspellingen')) return;
+      bezig(k, call('api_wedstrijdVerwijderen', token, k.getAttribute('data-verwijder')).then(function(){ return herlaadBeheer('Wedstrijd verwijderd'); }));
+    };
+  });
+  // uitnodigen
+  $('bKopieer').onclick = function(){
+    var inp = $('bLink');
+    var klaar = function(){ toast('Link gekopieerd'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(inp.value).then(klaar).catch(function(){ inp.select(); try { document.execCommand('copy'); klaar(); } catch(e){ toast('Kopiëren lukt niet, houd de link ingedrukt', true); } });
+    } else { inp.select(); try { document.execCommand('copy'); klaar(); } catch(e){ toast('Kopiëren lukt niet, houd de link ingedrukt', true); } }
+  };
+  $('bNieuweLink').onclick = function(){
+    var k = $('bNieuweLink');
+    if (!nogEens(k, 'Tik nog een keer om te bevestigen')) return;
+    bezig(k, call('api_nieuweLink', token).then(function(b){ beheer = b; tekenBeheer(); toast('Nieuwe link gemaakt'); }));
+  };
+  // ploegen
+  $('bTeamsOpslaan').onclick = function(){
+    var k = $('bTeamsOpslaan');
+    bezig(k, call('api_teamsOpslaan', token, $('bTeams').value).then(function(t){ beheer.teams = t; concept = null; tekenBeheer(); toast(t.length + ' ploegen opgeslagen'); }));
+  };
+  // selectie
+  $('bSelectieOpslaan').onclick = function(){
+    var k = $('bSelectieOpslaan');
+    bezig(k, call('api_selectieOpslaan', token, $('bSelectie').value).then(function(l){ extraConcept = {}; standConcept = {}; return herlaadBeheer(l.length + ' spelers opgeslagen'); }));
+  };
+  // huisstijl
+  var nieuwLogo;
+  var voorbeeld = function(){ pasHuisstijlToe({ kleur1: $('bK1').value, kleur2: $('bK2').value, clubnaam: $('bClub').value, competitie: $('bComp').value }, nieuwLogo !== undefined ? nieuwLogo : LOGO); };
+  $('bK1').oninput = voorbeeld; $('bK2').oninput = voorbeeld;
+  $('bLogo').onchange = function(){
+    var f = this.files && this.files[0]; if (!f) return;
+    verwerkLogo(f).then(function(r){
+      nieuwLogo = r.data;
+      $('bLogoVb').innerHTML = '<img alt="" src="' + r.data + '">';
+      if (r.kleuren[0]) $('bK1').value = r.kleuren[0];
+      if (r.kleuren[1]) $('bK2').value = r.kleuren[1];
+      voorbeeld();
+      toast('Logo geladen, tik op Opslaan');
+    }).catch(function(e){ toast(e.message, true); });
+  };
+  $('bStijl').onclick = function(){
+    var k = $('bStijl');
+    var h = { kleur1: $('bK1').value, kleur2: $('bK2').value, clubnaam: $('bClub').value, competitie: $('bComp').value };
+    if (nieuwLogo !== undefined) h.logo = nieuwLogo;
+    bezig(k, call('api_huisstijlOpslaan', token, h).then(function(){
+      HUISSTIJL = { kleur1: h.kleur1, kleur2: h.kleur2, clubnaam: h.clubnaam, competitie: h.competitie };
+      if (nieuwLogo !== undefined) LOGO = nieuwLogo;
+      pasHuisstijlToe(HUISSTIJL, LOGO);
+      return herlaadBeheer('Huisstijl opgeslagen');
+    }));
+  };
+  // spelers
+  Array.prototype.forEach.call(document.querySelectorAll('[data-beheer]'), function(k){
+    k.onclick = function(){ bezig(k, call('api_beheerZetten', token, k.getAttribute('data-beheer'), !!k.getAttribute('data-aan')).then(function(){ return herlaadBeheer('Aangepast'); })); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-spelerweg]'), function(k){
+    k.onclick = function(){
+      if (!nogEens(k, 'Zeker?')) return;
+      bezig(k, call('api_spelerVerwijderen', token, k.getAttribute('data-spelerweg')).then(function(){ return herlaadBeheer('Speler verwijderd'); }));
+    };
+  });
+}
+
+/** Logo verkleinen tot max 180 px en de twee opvallendste kleuren eruit halen. */
+function verwerkLogo(bestand){
+  return new Promise(function(res, rej){
+    var rd = new FileReader();
+    rd.onerror = function(){ rej(new Error('Kan het bestand niet lezen')); };
+    rd.onload = function(){
+      var img = new Image();
+      img.onerror = function(){ rej(new Error('Dit is geen afbeelding die ik kan lezen')); };
+      img.onload = function(){
+        var probeer = function(max){
+          var sc = Math.min(1, max / Math.max(img.width, img.height));
+          var c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+          var ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, c.width, c.height);
+          return { c: c, ctx: ctx };
+        };
+        var sizes = [180, 140, 110, 80], r, d;
+        for (var i = 0; i < sizes.length; i++) {
+          r = probeer(sizes[i]); d = r.c.toDataURL('image/png');
+          if (d.length > 44000) { var w = r.c.toDataURL('image/webp', .9); if (w.indexOf('data:image/webp') === 0 && w.length < d.length) d = w; }
+          if (d.length <= 44000) break;
+        }
+        if (d.length > 44000) return rej(new Error('Het logo is te groot, probeer een eenvoudiger plaatje'));
+        res({ data: d, kleuren: kleurenUit(r.ctx, r.c.width, r.c.height) });
+      };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(bestand);
+  });
+}
+function kleurenUit(ctx, w, h){
+  var px = ctx.getImageData(0, 0, w, h).data, tel = {};
+  for (var i = 0; i < px.length; i += 4) {
+    if (px[i + 3] < 160) continue;
+    var r = px[i], g = px[i + 1], b = px[i + 2];
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    if (mx - mn < 40 || mx < 35) continue; // grijs, wit, zwart overslaan
+    var k = (r >> 4) + ',' + (g >> 4) + ',' + (b >> 4);
+    var t = tel[k] || (tel[k] = { n: 0, r: 0, g: 0, b: 0 });
+    t.n++; t.r += r; t.g += g; t.b += b;
+  }
+  var lijst = Object.keys(tel).map(function(k){ var t = tel[k]; return { n: t.n, r: t.r / t.n, g: t.g / t.n, b: t.b / t.n }; })
+    .sort(function(a, b){ return b.n - a.n; });
+  var hex = function(c){ return '#' + [c.r, c.g, c.b].map(function(v){ return ('0' + Math.round(v).toString(16)).slice(-2); }).join(''); };
+  var uit = [];
+  lijst.forEach(function(c){
+    if (uit.length >= 2) return;
+    if (uit.every(function(u){ return Math.abs(u.r - c.r) + Math.abs(u.g - c.g) + Math.abs(u.b - c.b) > 120; })) uit.push(c);
+  });
+  // donkerste als hoofdkleur (beter leesbaar als kopbalk)
+  uit.sort(function(a, b){ return (a.r + a.g + a.b) - (b.r + b.g + b.b); });
+  return uit.map(hex);
+}
+
+/* ---------- start ---------- */
+function start(melding){
+  if (token) return laadOverzicht();
+  call('api_status').then(function(s){ login.heeftSpelers = s.heeftSpelers; if (!s.heeftSpelers) login.modus = 'nieuw'; toonLogin(melding); })
+    .catch(function(){ toonLogin(melding); });
+}
+document.addEventListener('visibilitychange', function(){ if (!document.hidden && token && data) laadOverzicht(true); });
+start();
+})();
+</script>
+</body>
+</html>
